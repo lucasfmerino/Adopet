@@ -8,7 +8,6 @@ import java.util.Scanner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 import br.com.adopet.client.ClientHttpConfiguration;
 import br.com.adopet.domain.Abrigo;
 
@@ -19,18 +18,17 @@ public class AbrigoService {
     public AbrigoService(ClientHttpConfiguration client) {
         this.client = client;
     }
-    
+
     public void listarAbrigo() throws IOException, InterruptedException {
         String uri = "http://localhost:8080/abrigos";
         HttpResponse<String> response = client.dispararRequisicaoGet(uri);
         String responseBody = response.body();
         Abrigo[] abrigos = new ObjectMapper().readValue(responseBody, Abrigo[].class);
         List<Abrigo> abrigoList = Arrays.stream(abrigos).toList();
-        System.out.println("Abrigos cadastrados:");
-        for (Abrigo abrigo : abrigoList) {
-            long id = abrigo.getId();
-            String nome = abrigo.getNome();
-            System.out.println(id + " - " + nome);
+        if (abrigoList.isEmpty()) {
+            System.out.println("Não há abrigos cadastrados.");
+        } else {
+            mostrarAbrigos(abrigoList);
         }
     }
 
@@ -54,6 +52,15 @@ public class AbrigoService {
         } else if (statusCode == 400 || statusCode == 500) {
             System.out.println("Erro ao cadastrar o abrigo:");
             System.out.println(responseBody);
+        }
+    }
+
+    private void mostrarAbrigos(List<Abrigo> abrigos) {
+        System.out.println("Abrigos cadastrados:");
+        for (Abrigo abrigo : abrigos) {
+            long id = abrigo.getId();
+            String nome = abrigo.getNome();
+            System.out.println(id + " - " + nome);
         }
     }
 
